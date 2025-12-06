@@ -28,7 +28,12 @@ function love.load()
     boat = {}
     boat.x = love.graphics.getWidth() / 2
     boat.y = love.graphics.getHeight() / 2
-    boat.speed = 100
+    boat.maxSpeed = 100
+    boat.acceleration = 200 -- How fast boat speeds up
+    boat.deceleration = 150 -- How fast it slows down
+    boat.velocityX = 0
+    boat.velocityY = 0
+    boat.currentSpeed = 0
     boat.catchRadius = 100
     boat.isMoving = false
 
@@ -62,30 +67,89 @@ function love.update(dt)
     -- Update camera position to follow the boat
     cam:lookAt(boat.x + 15, boat.y + 15)
 
-    -- Boat movement (and ensuring it stays within the playable area)
+    -- Boat movement with velocity-based physics
     boat.isMoving = false
-    local newX = boat.x
-    local newY = boat.y
+    local inputX = 0
+    local inputY = 0
 
+    -- Get player input direction
     if love.keyboard.isDown("w") then
-        newY = boat.y - boat.speed * dt
-        boat.isMoving = true
-    end
-    if love.keyboard.isDown("a") then
-        newX = boat.x - boat.speed * dt
+        inputY = inputY - 1
         boat.isMoving = true
     end
     if love.keyboard.isDown("s") then
-        newY = boat.y + boat.speed * dt
+        inputY = inputY + 1
+        boat.isMoving = true
+    end
+    if love.keyboard.isDown("a") then
+        inputX = inputX - 1
         boat.isMoving = true
     end
     if love.keyboard.isDown("d") then
-        newX = boat.x + boat.speed * dt
+        inputX = inputX + 1
         boat.isMoving = true
     end
 
+    if boat.isMoving then
+        -- Normalize input direction
+        local inputLength = math.sqrt(inputX * inputX + inputY * inputY)
+        if inputLength > 0 then
+            inputX = inputX / inputLength
+            inputY = inputY / inputLength
+        end
+
+        -- Calculate angle between current velocity and input direction
+        local currentVelLength = math.sqrt(boat.velocityX * boat.velocityX + boat.velocityY * boat.velocityY)
+        local speedMultiplier = 1.0
+
+        if currentVelLength > 0.1 then
+            -- Normalize current velocity
+            local currentDirX = boat.velocityX / currentVelLength
+            local currentDirY = boat.velocityY / currentVelLength
+
+            -- Calculate angle difference using dot product
+            local dotProduct = currentDirX * inputX + currentDirY * inputY
+            dotProduct = math.max(-1, math.min(1, dotProduct)) -- Clamp to [-1, 1]
+            local angleDifference = math.acos(dotProduct) -- Result in radians
+
+            -- Apply speed penalty based on angle difference
+            if angleDifference < math.rad(45) then
+                speedMultiplier = 0.9 + (1 - angleDifference / math.rad(45)) * 0.1 -- 90-100%
+            elseif angleDifference < math.rad(90) then
+                speedMultiplier = 0.7 + (1 - (angleDifference - math.rad(45)) / math.rad(45)) * 0.2 -- 70-90%
+            else
+                speedMultiplier = 0.5 + (1 - (angleDifference - math.rad(90)) / math.rad(90)) * 0.2 -- 50-70%
+            end
+        end
+
+        -- Target velocity with speed multiplier
+        local targetVelX = inputX * boat.maxSpeed * speedMultiplier
+        local targetVelY = inputY * boat.maxSpeed * speedMultiplier
+
+        -- Accelerate toward target velocity
+        local accel = boat.acceleration * dt
+        boat.velocityX = boat.velocityX + (targetVelX - boat.velocityX) * math.min(accel / boat.maxSpeed, 1)
+        boat.velocityY = boat.velocityY + (targetVelY - boat.velocityY) * math.min(accel / boat.maxSpeed, 1)
+    else
+        -- Decelerate when no input
+        local decel = boat.deceleration * dt
+        local currentVelLength = math.sqrt(boat.velocityX * boat.velocityX + boat.velocityY * boat.velocityY)
+
+        if currentVelLength > 0 then
+            local decelAmount = math.min(decel, currentVelLength)
+            boat.velocityX = boat.velocityX * (1 - decelAmount / currentVelLength)
+            boat.velocityY = boat.velocityY * (1 - decelAmount / currentVelLength)
+        end
+    end
+
+    -- Update current speed for reference
+    boat.currentSpeed = math.sqrt(boat.velocityX * boat.velocityX + boat.velocityY * boat.velocityY)
+
+    -- Apply velocity to position
+    local newX = boat.x + boat.velocityX * dt
+    local newY = boat.y + boat.velocityY * dt
+
     -- Check if new position is within circular playable area
-    -- Use boat center (boat.x + 15, boat.y + 15) for collision
     local boatCenterX = newX + 15
     local boatCenterY = newY + 15
     local distanceFromCenter = math.sqrt((boatCenterX - playableArea.x) ^ 2 + (boatCenterY - playableArea.y) ^ 2)
@@ -95,10 +159,14 @@ function love.update(dt)
         boat.x = newX
         boat.y = newY
     else
-        -- Clamp boat to edge of circle if it tries to go outside
+        -- Clamp boat to edge of circle and stop velocity in that direction
         local angle = math.atan2(boatCenterY - playableArea.y, boatCenterX - playableArea.x)
         boat.x = playableArea.x + math.cos(angle) * playableArea.radius - 15
         boat.y = playableArea.y + math.sin(angle) * playableArea.radius - 15
+
+        -- Reduce velocity when hitting boundary
+        boat.velocityX = boat.velocityX * 0.5
+        boat.velocityY = boat.velocityY * 0.5
     end
 
     -- If the boat is moving, the catching ring radius decreases to half its size over 1 second
