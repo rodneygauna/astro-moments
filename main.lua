@@ -29,7 +29,7 @@ function love.load()
     boat.x = love.graphics.getWidth() / 2
     boat.y = love.graphics.getHeight() / 2
     boat.speed = 100
-    boat.catchRadius = 40
+    boat.catchRadius = 100
     boat.isMoving = false
 
     -- Camera initialization
@@ -45,9 +45,17 @@ function love.update(dt)
         local radius = math.random() * playableArea.radius
         local fishX = playableArea.x + radius * math.cos(angle)
         local fishY = playableArea.y + radius * math.sin(angle)
+
+        -- Calculate dynamic spawn duration based on fish count
+        -- More fish = slower spawn (0.6s), fewer fish = faster spawn (0.1s)
+        local fishRatio = #fish / fish.maxFish
+        local dynamicSpawnDuration = 0.1 + (fishRatio * 0.8) -- Range: 0.1 to 0.9 seconds
+
         table.insert(fish, {
             x = fishX,
-            y = fishY
+            y = fishY,
+            spawnTimer = 0,
+            spawnDuration = dynamicSpawnDuration
         })
     end
 
@@ -102,6 +110,11 @@ function love.update(dt)
 
     -- Update fish positions (move in a random direction until they hit a boundary)
     for _, f in ipairs(fish) do
+        -- Update spawn animation timer
+        if f.spawnTimer < f.spawnDuration then
+            f.spawnTimer = f.spawnTimer + dt
+        end
+
         if not f.direction then
             f.direction = math.random() * 2 * math.pi
         end
@@ -165,8 +178,16 @@ function love.draw()
 
     -- Draw fish
     for _, f in ipairs(fish) do
+        -- Calculate spawn scale (ease in from 0 to 1)
+        local spawnScale = 1
+        if f.spawnTimer < f.spawnDuration then
+            local progress = f.spawnTimer / f.spawnDuration
+            -- Ease out cubic for smooth spawn
+            spawnScale = 1 - math.pow(1 - progress, 3)
+        end
+
         love.graphics.setColor(0, 0, 1) -- Blue color
-        love.graphics.circle("fill", f.x, f.y, 10)
+        love.graphics.circle("fill", f.x, f.y, 10 * spawnScale)
 
         -- Draw capture meter above fish if it's being caught
         if f.captureMeter and f.captureMeter > 0 then
