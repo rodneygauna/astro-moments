@@ -110,7 +110,7 @@ Navigate your tiny boat through peaceful waters, catching fish with your capture
 
 ## 📁 Project Structure
 
-```
+```text
 minnow-minutes/
 ├── main.lua              # Main game file
 ├── libs/                 # External libraries
@@ -126,7 +126,6 @@ minnow-minutes/
 For detailed game design documentation, see:
 
 - [Game Design Document](docs/MINNOW_MINUTES_GAME_DESIGN_DOCUMENT.md)
-- [Epics and User Stories](docs/EPICS_AND_USER_STORIES.md)
 
 ## 🤝 Contributing
 
