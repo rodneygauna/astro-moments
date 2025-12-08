@@ -4,6 +4,48 @@ local love = require("love")
 -- Library imports
 local cameraFile = require("libs/hump/camera")
 
+-- Helper Functions --
+
+-- Check if a save file exists
+function hasSaveFile()
+    -- Check if save file exists (implement later with file I/O)
+    return false
+end
+
+-- Get menu button position
+function getButtonY(index, totalButtons)
+    local totalHeight = (totalButtons * menu.buttonHeight) + ((totalButtons - 1) * menu.buttonSpacing)
+    local startY = (love.graphics.getHeight() - totalHeight) / 2
+    return startY + (index - 1) * (menu.buttonHeight + menu.buttonSpacing)
+end
+
+-- Check if mouse is over a button
+function isMouseOverButton(buttonIndex)
+    local mouseX, mouseY = love.mouse.getPosition()
+    local buttonX = (love.graphics.getWidth() - menu.buttonWidth) / 2
+    local buttonY = getButtonY(buttonIndex, #menu.buttons)
+
+    return mouseX >= buttonX and mouseX <= buttonX + menu.buttonWidth and mouseY >= buttonY and mouseY <= buttonY +
+               menu.buttonHeight
+end
+
+-- Handle menu button action
+function handleMenuAction(action)
+    if action == "continue" then
+        -- Load save file and continue
+        currentGameState = gameStates.SKILL_TREE
+    elseif action == "new_game" then
+        -- Reset player progress and start new game
+        currentGameState = gameStates.SKILL_TREE
+    elseif action == "settings" then
+        currentGameState = gameStates.SETTINGS
+    elseif action == "credits" then
+        currentGameState = gameStates.CREDITS
+    elseif action == "exit" then
+        love.event.quit()
+    end
+end
+
 -- Love2D load function
 function love.load()
     -- Set random seed
@@ -13,6 +55,74 @@ function love.load()
     currency = 0
     maxTime = 30 -- Maximum time for mining phase in seconds
     timeLeft = maxTime
+
+    -- Menu system
+    menu = {}
+    menu.buttons = {{
+        text = "Continue",
+        action = "continue",
+        enabled = false
+    }, {
+        text = "New Game",
+        action = "new_game",
+        enabled = true
+    }, {
+        text = "Settings",
+        action = "settings",
+        enabled = true
+    }, {
+        text = "Credits",
+        action = "credits",
+        enabled = true
+    }, {
+        text = "Exit",
+        action = "exit",
+        enabled = true
+    }}
+    menu.selectedIndex = 1 -- Currently selected button index
+    menu.buttonHeight = 50
+    menu.buttonWidth = 200
+    menu.buttonSpacing = 10
+
+    -- Check if there is a save file (to be implemented)
+    function hasSaveFile()
+        return false
+    end
+
+    -- Get menu button position
+    function getMenuButtonY(index, totalButtons)
+        local totalHeight = (totalButtons * menu.buttonHeight) + ((totalButtons - 1) * menu.buttonSpacing)
+        local startY = (love.graphics.getHeight() - totalHeight) / 2
+        return startY + (index - 1) * (menu.buttonHeight + menu.buttonSpacing)
+    end
+
+    -- Check if mouse is over a button
+    function isMouseOverButton(buttonIndex)
+        local mouseX, mouseY = love.mouse.getPosition()
+        local buttonX = (love.graphics.getWidth() - menu.buttonWidth) / 2
+        local buttonY = getButtonY(buttonIndex, #menu.buttons)
+        return mouseX >= buttonX and mouseX <= buttonX + menu.buttonWidth and mouseY >= buttonY and mouseY <= buttonY +
+                   menu.buttonHeight
+    end
+
+    -- Handle menu button action
+    function handleMenuAction(action)
+        if action == "continue" then
+            -- Load save file and continue (to be implemented)
+            currentGameState = gameStates.MAP_SELECTION
+        elseif action == "new_game" then
+            -- Reset player's progress and start new game (to be implemented)
+            currentGameState = gameStates.ROUND_START_BUFF_SELECTION
+        elseif action == "settings" then
+            -- Open settings menu (to be implemented)
+            currentGameState = gameStates.SETTINGS
+        elseif action == "credits" then
+            -- Open credits screen (to be implemented)
+            currentGameState = gameStates.CREDITS
+        elseif action == "exit" then
+            love.event.quit()
+        end
+    end
 
     -- Set the playable area size (circle)
     playableArea = {}
@@ -56,7 +166,9 @@ function love.load()
         MINING = "mining", -- mining phase
         CASHOUT = "cashout", -- cashing out phase (tally of collected asteroids for currency)
         PAUSED = "paused",
-        GAME_OVER = "game_over"
+        GAME_OVER = "game_over",
+        SETTINGS = "settings",
+        CREDITS = "credits"
     }
     currentGameState = gameStates.MENU
 
@@ -342,11 +454,44 @@ end
 function love.draw()
     -- Menu Screen
     if currentGameState == gameStates.MENU then
-        love.graphics.printf("Astro Momments\nPress Enter to Start", 0, love.graphics.getHeight() / 2 - 20,
-            love.graphics.getWidth(), "center")
+        -- Draw title
+        love.graphics.setColor(1, 1, 1)
+        local titleFont = love.graphics.newFont(48)
+        love.graphics.setFont(titleFont)
+        love.graphics.printf("Astro Momments", 0, 100, love.graphics.getWidth(), "center")
+
+        -- Reset to default font for buttons
+        love.graphics.setFont(love.graphics.newFont(20))
+
+        -- Draw buttons
+        for i, button in ipairs(menu.buttons) do
+            local buttonX = (love.graphics.getWidth() - menu.buttonWidth) / 2
+            local buttonY = getButtonY(i, #menu.buttons)
+
+            -- Determine button color
+            if not button.enabled then
+                love.graphics.setColor(0.3, 0.3, 0.3) -- Disabled
+            elseif isMouseOverButton(i) or menu.selectedIndex == i then
+                love.graphics.setColor(0.7, 0.7, 1) -- Highlighted
+            else
+                love.graphics.setColor(0.5, 0.5, 0.5) -- Normal
+            end
+
+            -- Draw button background
+            love.graphics.rectangle("fill", buttonX, buttonY, menu.buttonWidth, menu.buttonHeight)
+
+            -- Draw button border
+            love.graphics.setColor(1, 1, 1)
+            love.graphics.rectangle("line", buttonX, buttonY, menu.buttonWidth, menu.buttonHeight)
+
+            -- Draw button text
+            local textColor = button.enabled and {1, 1, 1} or {0.5, 0.5, 0.5}
+            love.graphics.setColor(textColor)
+            love.graphics.printf(button.text, buttonX, buttonY + (menu.buttonHeight - 20) / 2, menu.buttonWidth,
+                "center")
+        end
         return
     end
-
     -- Skill Tree Screen (not implemented, placeholder)
     if currentGameState == gameStates.SKILL_TREE then
         love.graphics.printf("Skill Tree Screen (Not Implemented)", 0, love.graphics.getHeight() / 2 - 20,
@@ -447,10 +592,34 @@ end
 
 -- Love2D keypressed function
 function love.keypressed(key)
-    -- Start the game from the menu
-    if currentGameState == gameStates.MENU and key == "return" then
-        currentGameState = gameStates.ROUND_START_BUFF_SELECTION
-    elseif currentGameState == gameStates.ROUND_START_BUFF_SELECTION and key == "return" then
+    -- Menu screen input handling
+    if currentGameState == gameStates.MENU then
+        if key == "up" then
+            -- Move selection up (skip disabled buttons)
+            repeat
+                menu.selectedIndex = menu.selectedIndex - 1
+                if menu.selectedIndex < 1 then
+                    menu.selectedIndex = #menu.buttons
+                end
+            until menu.buttons[menu.selectedIndex].enabled
+        elseif key == "down" then
+            -- Move selection down (skip disabled buttons)
+            repeat
+                menu.selectedIndex = menu.selectedIndex + 1
+                if menu.selectedIndex > #menu.buttons then
+                    menu.selectedIndex = 1
+                end
+            until menu.buttons[menu.selectedIndex].enabled
+        elseif key == "return" or key == "space" then
+            handleMenuAction(menu.buttons[menu.selectedIndex].action)
+        elseif key == "escape" then
+            love.event.quit()
+        end
+        return
+    end
+
+    -- Other game state input handling
+    if currentGameState == gameStates.ROUND_START_BUFF_SELECTION and key == "return" then
         -- Placeholder to go to map selection
         currentGameState = gameStates.MAP_SELECTION
     elseif currentGameState == gameStates.MAP_SELECTION and key == "return" then
@@ -459,5 +628,25 @@ function love.keypressed(key)
     elseif currentGameState == gameStates.CASHOUT and key == "return" then
         -- Placeholder to go back to map selection
         currentGameState = gameStates.MAP_SELECTION
+    elseif currentGameState == gameStates.SETTINGS then
+        if key == "escape" then
+            currentGameState = gameStates.MENU
+        end
+    elseif currentGameState == gameStates.CREDITS then
+        if key == "escape" then
+            currentGameState = gameStates.MENU
+        end
+    end
+end
+
+-- Love2D mousepressed function
+function love.mousepressed(x, y, button)
+    if currentGameState == gameStates.MENU and button == 1 then
+        for i, menuButton in ipairs(menu.buttons) do
+            if menuButton.enabled and isMouseOverButton(i) then
+                handleMenuAction(menuButton.action)
+                break
+            end
+        end
     end
 end
