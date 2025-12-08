@@ -37,6 +37,11 @@ function love.load()
     spaceship.collectionRadius = 100
     spaceship.isMoving = false
 
+    -- Game state table for future use
+    -- (eg. menu, skill tree, round start buff selection, playing, paused, game over)
+    gameState = {}
+    gameState.current = "menu"
+
     -- Camera initialization
     cam = cameraFile()
 end
@@ -73,19 +78,19 @@ function love.update(dt)
     local inputY = 0
 
     -- Get player input direction
-    if love.keyboard.isDown("w") then
+    if love.keyboard.isDown("w", "up") then
         inputY = inputY - 1
         spaceship.isMoving = true
     end
-    if love.keyboard.isDown("s") then
+    if love.keyboard.isDown("s", "down") then
         inputY = inputY + 1
         spaceship.isMoving = true
     end
-    if love.keyboard.isDown("a") then
+    if love.keyboard.isDown("a", "left") then
         inputX = inputX - 1
         spaceship.isMoving = true
     end
-    if love.keyboard.isDown("d") then
+    if love.keyboard.isDown("d", "right") then
         inputX = inputX + 1
         spaceship.isMoving = true
     end
