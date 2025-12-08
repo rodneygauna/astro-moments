@@ -1,8 +1,8 @@
-# Minnow Minutes — Game Design Document (GDD)
+# Astro Moments — Game Design Document (GDD)
 
 ## 0. Game Summary
 
-Title: Minnow Minutes
+Title: Astro Moments
 Genre: Action Space Mining Microgame + Upgrade Loop
 Engine: LÖVE (Love2D)
 Theme: The player has a limited amount of time to mine as many asteroids as possible.

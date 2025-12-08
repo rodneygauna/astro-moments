@@ -1,4 +1,4 @@
-# 🎣 Minnow Minutes
+# 🚀 Astro Moments
 
 > **Codedex 2025 Game Jam Entry**
 
@@ -55,8 +55,8 @@ Navigate your tiny spaceship through the depths of space, collecting asteroids w
 1. **Clone the repository**
 
    ```bash
-   git clone https://github.com/rodneygauna/minnow-minutes.git
-   cd minnow-minutes
+   git clone https://github.com/rodneygauna/astro-moments.git
+   cd astro-moments
    ```
 
 2. **Run the game**
@@ -111,7 +111,7 @@ Navigate your tiny spaceship through the depths of space, collecting asteroids w
 ## 📁 Project Structure
 
 ```text
-minnow-minutes/
+astro-moments/
 ├── main.lua              # Main game file
 ├── libs/                 # External libraries
 │   └── hump/            # Camera and utility library
@@ -125,7 +125,7 @@ minnow-minutes/
 
 For detailed game design documentation, see:
 
-- [Game Design Document](docs/MINNOW_MINUTES_GAME_DESIGN_DOCUMENT.md)
+- [Game Design Document](docs/ASTRO_MOMENTS_GAME_DESIGN_DOCUMENT.md)
 
 ## 🤝 Contributing
 
