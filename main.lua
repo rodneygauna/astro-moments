@@ -51,8 +51,40 @@ function love.load()
     -- Set random seed
     math.randomseed(os.time())
 
+    -- Player data structure
+    player = {}
+    player.name = "Captain" -- Player's name
+    player.shipName = "Starfarer" -- Ship's name
+    player.currency = {
+        gold = 0, -- Mining currency earned from collecting asteroids
+        fuel = 100 -- Fuel currency for traveling to sectors/maps
+    }
+    player.skills = {
+        -- Purchased skills from skill tree (to be implemented)
+        -- Example: {id = "faster_mining", level = 2, maxLevel = 5}
+    }
+    player.stats = {
+        -- Permanent stat upgrades from skill tree
+        collectionSpeedBonus = 0, -- Percentage bonus
+        cargoCapacityBonus = 0, -- Flat bonus
+        movementSpeedBonus = 0, -- Percentage bonus
+        fuelEfficiency = 0 -- Reduces fuel cost per mission
+    }
+    player.progress = {
+        unlockedMaps = {"sector_1"}, -- List of unlocked map/sector IDs
+        completedMissions = 0, -- Total missions completed
+        totalAsteroidsCollected = 0, -- Lifetime asteroid count
+        playTime = 0 -- Total playtime in seconds
+    }
+    player.settings = {
+        -- Player preferences
+        musicVolume = 1.0,
+        sfxVolume = 1.0,
+        fullscreen = false,
+        vsync = true
+    }
+
     -- Initialize game variables
-    currency = 0
     maxTime = 30 -- Maximum time for mining phase in seconds
     timeLeft = maxTime
 
@@ -139,11 +171,11 @@ function love.load()
     asteroids.collectionSpeed = 50 -- Percentage per second when in field
     asteroids.decaySpeed = 30 -- Percentage per second when out of field
 
-    -- Spaceship initialization
+    -- Spaceship initialization (runtime state)
     spaceship = {}
     spaceship.x = love.graphics.getWidth() / 2
     spaceship.y = love.graphics.getHeight() / 2
-    spaceship.maxSpeed = 100
+    spaceship.maxSpeed = 100 + (100 * player.stats.movementSpeedBonus / 100) -- Base speed + bonus
     spaceship.acceleration = 200 -- How fast spaceship speeds up
     spaceship.deceleration = 150 -- How fast it slows down
     spaceship.velocityX = 0
@@ -151,11 +183,8 @@ function love.load()
     spaceship.currentSpeed = 0
     spaceship.collectionRadius = 100
     spaceship.isMoving = false
-    spaceship.name = "Player 1"
-    spaceship.maxCargo = 5 -- Max number of asteroids that can be collected before the cashout phase
+    spaceship.maxCargo = 5 + player.stats.cargoCapacityBonus -- Base cargo + bonus from skills
     spaceship.currentCargo = 0
-    spaceship.fuelCapacity = 5 -- Max fuel capacity (each planet (on the map) will cost fuel to start the mining phase)
-    spaceship.currentFuel = spaceship.fuelCapacity
 
     -- Game state definitions
     gameStates = {
