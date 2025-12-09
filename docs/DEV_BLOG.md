@@ -90,4 +90,6 @@ I started working on game states, adding a menu screen and placeholders for othe
 
 I also added some more variables to the ship, such as cargo capacity and fuel (this will act as the travel currency).
 
+Additionally, I started breaking my code up into modules to improve organization and maintainability. This will make it easier to manage the codebase as the project grows. I saw this example in Challacade's course and thought it was a good idea; I just took it to the next level from my previous experience doing web development.
+
 I'm also just realizing that the repo and the GDD have "Momments" misspelled as "Momments". I'll need to fix that later.
