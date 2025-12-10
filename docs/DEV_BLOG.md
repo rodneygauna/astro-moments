@@ -105,3 +105,15 @@ To end the night, I worked on the Cashout screen. After completing a mission, th
 Additionally, I started breaking my code up into modules to improve organization and maintainability. This will make it easier to manage the codebase as the project grows. I saw this example in Challacade's course and thought it was a good idea; I just took it to the next level from my previous experience doing web development.
 
 I'm also just realizing that the repo and the GDD have "Moments" misspelled as "Momments". I'll need to fix that later.
+
+## Day 5 (December 9, 2025)
+
+**Drinks Consumed:** 32oz of water (with Limeade flavoring)
+
+More progress made today, specifically on adding player upgrades. Players can now spend their gold to improve various aspects of their ship, such as catch radius increasing, cargo capacity, fuel efficiency, and speed. These upgrades will help players feel a sense of progression and make their missions easier. I've been brainstorming what the upgrades would be, so implementing them wasn't too difficult. I did have to spend time ensuring I was applying the upgrades correctly on the various aspects of the ship and player properties.
+
+![Player Upgrades Screenshot](screenshots/Day05.gif)
+
+I also noticed that I hard coded some values that weren't allowing the temporary buffs or permanent upgrades to function correctly. I need to refactor the code to make these values configurable, so that buffs and upgrades can be applied dynamically.
+
+With this in place, I need to work out a few more issues and improvements, such as the UI and mouse/keyboard controlls. Once those are in a good spot, I'll move onto implementing settings and saving a player's progress (which I'll need to do more research on). In the meantime, I'm watching pixel art tutorials, [PixelRocket](https://www.youtube.com/@PixelRocket) has some great content that I'm going to apply to the game's visuals.
