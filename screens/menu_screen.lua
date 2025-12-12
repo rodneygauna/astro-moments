@@ -7,6 +7,10 @@ local Save = require("src.save")
 -- Menu state
 local menu = {}
 local backgroundImage
+local confirmationDialog = {
+    visible = false,
+    selectedButton = 1 -- 1 = Yes, 2 = No
+}
 
 -- Helper function: Get menu button Y position
 local function getButtonY(index, totalButtons)
@@ -89,8 +93,15 @@ local function handleMenuAction(action)
             -- Could show error message to user here
         end
     elseif action == "new_game" then
-        -- Reset player progress and start new game
-        menu.changeState(menu.gameStates.ROUND_START_BUFF_SELECTION)
+        -- Check if save file exists
+        if Save.exists() then
+            -- Show confirmation dialog
+            confirmationDialog.visible = true
+            confirmationDialog.selectedButton = 1 -- Default to "Yes"
+        else
+            -- No save file, proceed directly
+            menu.changeState(menu.gameStates.ROUND_START_BUFF_SELECTION)
+        end
     elseif action == "settings" then
         menu.changeState(menu.gameStates.SETTINGS)
     elseif action == "credits" then
@@ -157,6 +168,77 @@ function MenuScreen.draw()
     local controlsY = love.graphics.getHeight() - 50
     love.graphics.printf("[W/S or UP/DOWN] Navigate  [ENTER/SPACE or CLICK] Select  [ESC] Quit", 0, controlsY,
         love.graphics.getWidth(), "center")
+
+    -- Draw confirmation dialog if visible
+    if confirmationDialog.visible then
+        -- Draw semi-transparent overlay
+        love.graphics.setColor(0, 0, 0, 0.7)
+        love.graphics.rectangle("fill", 0, 0, love.graphics.getWidth(), love.graphics.getHeight())
+
+        -- Dialog box dimensions
+        local dialogWidth = 500
+        local dialogHeight = 200
+        local dialogX = (love.graphics.getWidth() - dialogWidth) / 2
+        local dialogY = (love.graphics.getHeight() - dialogHeight) / 2
+
+        -- Draw dialog background
+        love.graphics.setColor(0.15, 0.15, 0.2)
+        love.graphics.rectangle("fill", dialogX, dialogY, dialogWidth, dialogHeight, 10, 10)
+
+        -- Draw dialog border
+        love.graphics.setColor(0.7, 0.7, 0.8)
+        love.graphics.setLineWidth(3)
+        love.graphics.rectangle("line", dialogX, dialogY, dialogWidth, dialogHeight, 10, 10)
+        love.graphics.setLineWidth(1)
+
+        -- Draw warning message
+        love.graphics.setColor(1, 1, 1)
+        love.graphics.setFont(love.graphics.newFont(20))
+        love.graphics.printf("Start New Game?", dialogX, dialogY + 20, dialogWidth, "center")
+
+        love.graphics.setFont(love.graphics.newFont(16))
+        love.graphics.setColor(1, 0.7, 0.7)
+        love.graphics.printf("Your current save file will be deleted.", dialogX + 20, dialogY + 60, dialogWidth - 40,
+            "center")
+        love.graphics.setColor(0.9, 0.9, 0.9)
+        love.graphics.printf("This action cannot be undone.", dialogX + 20, dialogY + 85, dialogWidth - 40, "center")
+
+        -- Draw Yes/No buttons
+        local buttonWidth = 120
+        local buttonHeight = 40
+        local buttonSpacing = 20
+        local yesButtonX = dialogX + (dialogWidth / 2) - buttonWidth - (buttonSpacing / 2)
+        local noButtonX = dialogX + (dialogWidth / 2) + (buttonSpacing / 2)
+        local buttonY = dialogY + dialogHeight - 60
+
+        -- Yes button
+        if confirmationDialog.selectedButton == 1 then
+            love.graphics.setColor(0.8, 0.3, 0.3) -- Red when selected
+        else
+            love.graphics.setColor(0.5, 0.2, 0.2)
+        end
+        love.graphics.rectangle("fill", yesButtonX, buttonY, buttonWidth, buttonHeight, 5, 5)
+        love.graphics.setColor(1, 1, 1)
+        love.graphics.rectangle("line", yesButtonX, buttonY, buttonWidth, buttonHeight, 5, 5)
+        love.graphics.printf("Yes", yesButtonX, buttonY + 10, buttonWidth, "center")
+
+        -- No button
+        if confirmationDialog.selectedButton == 2 then
+            love.graphics.setColor(0.3, 0.6, 0.3) -- Green when selected
+        else
+            love.graphics.setColor(0.2, 0.4, 0.2)
+        end
+        love.graphics.rectangle("fill", noButtonX, buttonY, buttonWidth, buttonHeight, 5, 5)
+        love.graphics.setColor(1, 1, 1)
+        love.graphics.rectangle("line", noButtonX, buttonY, buttonWidth, buttonHeight, 5, 5)
+        love.graphics.printf("No", noButtonX, buttonY + 10, buttonWidth, "center")
+
+        -- Draw dialog controls hint
+        love.graphics.setColor(0.7, 0.7, 0.7)
+        love.graphics.setFont(love.graphics.newFont(12))
+        love.graphics.printf("[LEFT/RIGHT or A/D] Choose  [ENTER/SPACE] Confirm", dialogX, dialogY + dialogHeight - 20,
+            dialogWidth, "center")
+    end
 end
 
 -- Handle keyboard input
@@ -165,6 +247,30 @@ function MenuScreen.keypressed(key)
         return
     end
 
+    -- Handle confirmation dialog input separately
+    if confirmationDialog.visible then
+        if key == "left" or key == "a" then
+            confirmationDialog.selectedButton = 1 -- Yes
+        elseif key == "right" or key == "d" then
+            confirmationDialog.selectedButton = 2 -- No
+        elseif key == "return" or key == "space" then
+            if confirmationDialog.selectedButton == 1 then
+                -- Yes - Delete save and start new game
+                Save.delete()
+                confirmationDialog.visible = false
+                menu.changeState(menu.gameStates.ROUND_START_BUFF_SELECTION)
+            else
+                -- No - Close dialog
+                confirmationDialog.visible = false
+            end
+        elseif key == "escape" then
+            -- ESC also closes dialog (acts as "No")
+            confirmationDialog.visible = false
+        end
+        return
+    end
+
+    -- Normal menu navigation
     if key == "up" or key == "w" then
         -- Move selection up (skip disabled buttons)
         repeat
@@ -197,6 +303,44 @@ function MenuScreen.mousepressed(x, y, button)
     end
 
     if button == 1 then
+        -- Handle confirmation dialog clicks
+        if confirmationDialog.visible then
+            local dialogWidth = 500
+            local dialogHeight = 200
+            local dialogX = (love.graphics.getWidth() - dialogWidth) / 2
+            local dialogY = (love.graphics.getHeight() - dialogHeight) / 2
+
+            local buttonWidth = 120
+            local buttonHeight = 40
+            local buttonSpacing = 20
+            local yesButtonX = dialogX + (dialogWidth / 2) - buttonWidth - (buttonSpacing / 2)
+            local noButtonX = dialogX + (dialogWidth / 2) + (buttonSpacing / 2)
+            local buttonY = dialogY + dialogHeight - 60
+
+            -- Check Yes button click
+            if x >= yesButtonX and x <= yesButtonX + buttonWidth and y >= buttonY and y <= buttonY + buttonHeight then
+                -- Yes - Delete save and start new game
+                Save.delete()
+                confirmationDialog.visible = false
+                menu.changeState(menu.gameStates.ROUND_START_BUFF_SELECTION)
+                return
+            end
+
+            -- Check No button click
+            if x >= noButtonX and x <= noButtonX + buttonWidth and y >= buttonY and y <= buttonY + buttonHeight then
+                -- No - Close dialog
+                confirmationDialog.visible = false
+                return
+            end
+
+            -- Click outside dialog closes it
+            if x < dialogX or x > dialogX + dialogWidth or y < dialogY or y > dialogY + dialogHeight then
+                confirmationDialog.visible = false
+            end
+            return
+        end
+
+        -- Normal menu button clicks
         for i, menuButton in ipairs(menu.buttons) do
             if menuButton.enabled and isMouseOverButton(i) then
                 handleMenuAction(menuButton.action)
