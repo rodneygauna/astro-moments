@@ -12,6 +12,8 @@ A cozy space mining microgame where every minute counts! Collect as many asteroi
 
 Navigate your tiny spaceship through the depths of space, collecting asteroids with your collection field. The longer an asteroid stays within your field, the closer you are to collecting it! But be careful—asteroids can escape if they leave your radius, and your collection ability changes as you move.
 
+![Gameplay Demo](docs/gifs/AstroMoments_MiningLoop.gif)
+
 ### Core Gameplay Loop
 
 1. **Mine** - Navigate your spaceship to collect drifting asteroids
