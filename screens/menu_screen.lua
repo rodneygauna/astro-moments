@@ -5,6 +5,7 @@ local MenuScreen = {}
 local Save = require("src.save")
 local Upgrades = require("src.upgrades")
 local Version = require("version")
+local SFX = require("src/sfx")
 
 -- Menu state
 local menu = {}
@@ -20,6 +21,10 @@ local confirmationDialog = {
     visible = false,
     selectedButton = 1 -- 1 = Yes, 2 = No
 }
+
+-- Track previous hover state for sound effects
+local previousHoveredButton = nil
+local previousHoveredVersionBadge = false
 
 -- Animated background elements
 local farStars -- Background star layer
@@ -276,6 +281,28 @@ function MenuScreen.update(dt)
         return
     end
 
+    -- Check for button hover changes and play sound
+    if menu.buttons then
+        local currentHoveredButton = nil
+        for i = 1, #menu.buttons do
+            if isMouseOverButton(i) then
+                currentHoveredButton = i
+                break
+            end
+        end
+        if currentHoveredButton ~= previousHoveredButton and currentHoveredButton ~= nil then
+            SFX.playButtonHover()
+        end
+        previousHoveredButton = currentHoveredButton
+    end
+
+    -- Check for version badge hover changes and play sound
+    local currentHoveredVersionBadge = isMouseOverVersionBadge()
+    if currentHoveredVersionBadge and not previousHoveredVersionBadge then
+        SFX.playButtonHover()
+    end
+    previousHoveredVersionBadge = currentHoveredVersionBadge
+
     -- Update star drift time
     starDriftTime = starDriftTime + dt
     local driftSpeed = 5 -- pixels per second
@@ -477,10 +504,13 @@ function MenuScreen.keypressed(key)
     -- Handle confirmation dialog input separately
     if confirmationDialog.visible then
         if key == "left" or key == "a" then
+            SFX.playButtonHover()
             confirmationDialog.selectedButton = 1 -- Yes
         elseif key == "right" or key == "d" then
+            SFX.playButtonHover()
             confirmationDialog.selectedButton = 2 -- No
         elseif key == "return" or key == "space" then
+            SFX.playButtonClick()
             if confirmationDialog.selectedButton == 1 then
                 -- Yes - Delete save and start new game
                 Save.delete()
@@ -506,6 +536,7 @@ function MenuScreen.keypressed(key)
                 menu.selectedIndex = #menu.buttons
             end
         until menu.buttons[menu.selectedIndex].enabled
+        SFX.playButtonHover()
     elseif key == "down" or key == "s" then
         -- Move selection down (skip disabled buttons)
         repeat
@@ -514,7 +545,9 @@ function MenuScreen.keypressed(key)
                 menu.selectedIndex = 1
             end
         until menu.buttons[menu.selectedIndex].enabled
+        SFX.playButtonHover()
     elseif key == "return" or key == "space" then
+        SFX.playButtonClick()
         if menu.buttons[menu.selectedIndex] then
             handleMenuAction(menu.buttons[menu.selectedIndex].action)
         end
@@ -546,6 +579,7 @@ function MenuScreen.mousepressed(x, y, button)
 
             -- Check Yes button click
             if x >= yesButtonX and x <= yesButtonX + buttonWidth and y >= buttonY and y <= buttonY + buttonHeight then
+                SFX.playButtonClick()
                 -- Yes - Delete save and start new game
                 Save.delete()
                 confirmationDialog.visible = false
@@ -555,6 +589,7 @@ function MenuScreen.mousepressed(x, y, button)
 
             -- Check No button click
             if x >= noButtonX and x <= noButtonX + buttonWidth and y >= buttonY and y <= buttonY + buttonHeight then
+                SFX.playButtonClick()
                 -- No - Close dialog
                 confirmationDialog.visible = false
                 return
@@ -569,6 +604,7 @@ function MenuScreen.mousepressed(x, y, button)
 
         -- Check version badge click
         if isMouseOverVersionBadge() then
+            SFX.playButtonClick()
             if menu.changeState and menu.gameStates then
                 menu.changeState(menu.gameStates.CHANGELOG)
             end
@@ -578,6 +614,7 @@ function MenuScreen.mousepressed(x, y, button)
         -- Normal menu button clicks
         for i, menuButton in ipairs(menu.buttons) do
             if menuButton.enabled and isMouseOverButton(i) then
+                SFX.playButtonClick()
                 handleMenuAction(menuButton.action)
                 break
             end

@@ -7,6 +7,7 @@ local Asteroid = require("src/asteroid")
 local Sector = require("src/sector")
 local Buff = require("src/buff")
 local Obstacle = require("src.obstacles.init")
+local Settings = require("src/settings")
 
 -- Mining state
 local cam

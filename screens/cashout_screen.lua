@@ -4,6 +4,7 @@ local CashoutScreen = {}
 
 local Player = require("src/player")
 local Save = require("src/save")
+local SFX = require("src/sfx")
 
 -- Cashout state
 local player
@@ -225,6 +226,7 @@ end
 -- Handle keyboard input
 function CashoutScreen.keypressed(key)
     if key == "space" or key == "return" then
+        SFX.playButtonClick()
         -- Always return to map selection where player can refuel if needed
         changeState(gameStates.MAP_SELECTION)
     end
@@ -232,7 +234,11 @@ end
 
 -- Handle mouse input
 function CashoutScreen.mousepressed(x, y, button)
-    -- Optional: could add a continue button here
+    if button == 1 then
+        SFX.playButtonClick()
+        -- Click anywhere to continue
+        changeState(gameStates.MAP_SELECTION)
+    end
 end
 
 return CashoutScreen

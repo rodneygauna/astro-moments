@@ -6,6 +6,7 @@ local Player = require("src/player")
 local Sector = require("src/sector")
 local Save = require("src/save")
 local Upgrades = require("src/upgrades")
+local SFX = require("src/sfx")
 
 -- Map screen state
 local player
@@ -13,6 +14,7 @@ local gameStates
 local changeState
 local sectorButtons
 local hoveredButton
+local previousHoveredButton
 local upgradeButton
 local refuelButton
 local scrollOffset
@@ -119,6 +121,10 @@ function MapScreen.update(dt)
     if mouseX >= upgradeButton.x and mouseX <= upgradeButton.x + upgradeButton.width and mouseY >= upgradeButton.y and
         mouseY <= upgradeButton.y + upgradeButton.height then
         hoveredButton = upgradeButton
+        if previousHoveredButton ~= hoveredButton then
+            SFX.playButtonHover()
+        end
+        previousHoveredButton = hoveredButton
         return
     end
 
@@ -126,6 +132,10 @@ function MapScreen.update(dt)
     if mouseX >= refuelButton.x and mouseX <= refuelButton.x + refuelButton.width and mouseY >= refuelButton.y and
         mouseY <= refuelButton.y + refuelButton.height then
         hoveredButton = refuelButton
+        if previousHoveredButton ~= hoveredButton then
+            SFX.playButtonHover()
+        end
+        previousHoveredButton = hoveredButton
         return
     end
 
@@ -147,8 +157,17 @@ function MapScreen.update(dt)
 
         if mouseX >= itemX and mouseX <= itemX + itemWidth and mouseY >= itemY and mouseY <= itemY + itemButtonHeight then
             hoveredButton = i
+            if previousHoveredButton ~= hoveredButton then
+                SFX.playButtonHover()
+            end
+            previousHoveredButton = hoveredButton
             break
         end
+    end
+
+    -- Update previousHoveredButton if nothing is hovered
+    if hoveredButton == nil then
+        previousHoveredButton = nil
     end
 end
 
@@ -434,10 +453,13 @@ end
 -- Handle keyboard input
 function MapScreen.keypressed(key)
     if key == "escape" then
+        SFX.playButtonClick()
         changeState(gameStates.MENU)
     elseif key == "u" then
+        SFX.playButtonClick()
         changeState(gameStates.SKILL_TREE)
     elseif key == "r" then
+        SFX.playButtonClick()
         -- Handle refuel or emergency beacon
         if Player.needsEmergencyBeacon(player) then
             local success, message = Player.useEmergencyBeacon(player)
@@ -457,6 +479,7 @@ function MapScreen.keypressed(key)
     elseif key == "w" or key == "up" then
         -- Navigate up
         if selectedIndex > 1 then
+            SFX.playButtonHover()
             selectedIndex = selectedIndex - 1
             -- Auto-scroll to keep selected button visible
             if selectedIndex < scrollOffset + 1 then
@@ -466,6 +489,7 @@ function MapScreen.keypressed(key)
     elseif key == "s" or key == "down" then
         -- Navigate down
         if selectedIndex < #sectorButtons then
+            SFX.playButtonHover()
             selectedIndex = selectedIndex + 1
             -- Auto-scroll to keep selected button visible
             if selectedIndex > scrollOffset + maxVisibleSectors then
@@ -473,6 +497,7 @@ function MapScreen.keypressed(key)
             end
         end
     elseif key == "return" or key == "space" then
+        SFX.playButtonClick()
         -- Select the currently highlighted sector
         local btn = sectorButtons[selectedIndex]
 
@@ -515,6 +540,7 @@ function MapScreen.mousepressed(x, y, button)
         -- Check if upgrade button was clicked
         if x >= upgradeButton.x and x <= upgradeButton.x + upgradeButton.width and y >= upgradeButton.y and y <=
             upgradeButton.y + upgradeButton.height then
+            SFX.playButtonClick()
             changeState(gameStates.SKILL_TREE)
             return
         end
@@ -522,6 +548,7 @@ function MapScreen.mousepressed(x, y, button)
         -- Check if refuel button was clicked
         if x >= refuelButton.x and x <= refuelButton.x + refuelButton.width and y >= refuelButton.y and y <=
             refuelButton.y + refuelButton.height then
+            SFX.playButtonClick()
             if Player.needsEmergencyBeacon(player) then
                 local success, message = Player.useEmergencyBeacon(player)
                 if success then
@@ -552,6 +579,7 @@ function MapScreen.mousepressed(x, y, button)
 
         -- Check sector buttons (using card-based layout)
         if hoveredButton and type(hoveredButton) == "number" then
+            SFX.playButtonClick()
             local buttonIndex = hoveredButton
             local btn = sectorButtons[buttonIndex]
 

@@ -4,6 +4,7 @@ local love = require("love")
 -- Module imports
 local Player = require("src/player")
 local Settings = require("src/settings")
+local SFX = require("src/sfx")
 local MenuScreen = require("screens/menu_screen")
 local MiningScreen = require("screens/mining_screen")
 local CashoutScreen = require("screens/cashout_screen")
@@ -112,6 +113,9 @@ function love.load()
     currentTrackIndex = 1
     love.audio.play(musicTracks[currentTrackIndex])
 
+    -- Load sound effects
+    SFX.load()
+
     -- Initialize player
     player = Player.new()
 
@@ -131,6 +135,16 @@ end
 function love.update(dt)
     -- Update player playtime
     Player.updatePlaytime(player, dt)
+
+    -- Apply music volume settings to all tracks
+    local settings = Settings.get()
+    for _, track in ipairs(musicTracks) do
+        if settings.audio.musicMuted then
+            track:setVolume(0)
+        else
+            track:setVolume(settings.audio.musicVolume)
+        end
+    end
 
     -- Check if current music track has finished and start next track
     if not musicTracks[currentTrackIndex]:isPlaying() then

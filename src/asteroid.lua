@@ -282,6 +282,10 @@ function Asteroid.updateAll(asteroids, dt, playableArea, spaceship, playerStats)
             table.insert(spaceship.collectedAsteroids, asteroids[i])
             table.remove(asteroids, i)
             spaceship.currentCargo = spaceship.currentCargo + 1
+
+            -- Play capture sound effect
+            local SFX = require("src/sfx")
+            SFX.playAsteroidCapture()
         end
     end
 end

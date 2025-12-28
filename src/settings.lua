@@ -7,7 +7,9 @@ local json = require("libs/dkjson/dkjson")
 local defaultSettings = {
     audio = {
         musicVolume = 0.7, -- 0.0 to 1.0
-        musicMuted = false
+        musicMuted = false,
+        sfxVolume = 0.7, -- 0.0 to 1.0
+        sfxMuted = false
     },
     video = {
         width = 1024,
@@ -51,6 +53,19 @@ function Settings.load()
             local decoded, pos, err = json.decode(contents)
             if decoded then
                 currentSettings = decoded
+
+                -- Merge with defaults for any missing properties
+                for category, settings in pairs(defaultSettings) do
+                    if not currentSettings[category] then
+                        currentSettings[category] = {}
+                    end
+                    for key, value in pairs(settings) do
+                        if currentSettings[category][key] == nil then
+                            currentSettings[category][key] = value
+                        end
+                    end
+                end
+
                 return true
             end
         end
@@ -109,12 +124,9 @@ function Settings.apply()
         resizable = false
     })
 
-    -- Apply audio settings
-    if currentSettings.audio.musicMuted then
-        love.audio.setVolume(0)
-    else
-        love.audio.setVolume(currentSettings.audio.musicVolume)
-    end
+    -- Note: Audio settings are applied per-source
+    -- Music tracks must have their volume set individually in main.lua
+    -- SFX volume is applied when each sound effect is played
 end
 
 -- Update specific setting

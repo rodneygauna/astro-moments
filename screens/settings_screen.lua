@@ -3,6 +3,7 @@
 local SettingsScreen = {}
 
 local Settings = require("src/settings")
+local SFX = require("src/sfx")
 
 -- Screen state
 local gameStates
@@ -225,9 +226,7 @@ function SettingsScreen.load(states, stateChanger)
         setValue = function(value)
             Settings.set("audio", "musicVolume", value)
             settings.audio.musicVolume = value
-            if not settings.audio.musicMuted then
-                love.audio.setVolume(value)
-            end
+            -- Volume will be applied to music tracks on next update
         end
     }, {
         id = 5,
@@ -243,11 +242,37 @@ function SettingsScreen.load(states, stateChanger)
         setValue = function(value)
             Settings.set("audio", "musicMuted", value)
             settings.audio.musicMuted = value
-            if value then
-                love.audio.setVolume(0)
-            else
-                love.audio.setVolume(settings.audio.musicVolume)
-            end
+            -- Mute status will be applied to music tracks on next update
+        end
+    }, {
+        id = 6,
+        type = "slider",
+        label = "SFX Volume",
+        x = 350,
+        y = 530,
+        width = 300,
+        height = 20,
+        getValue = function()
+            return settings.audio.sfxVolume
+        end,
+        setValue = function(value)
+            Settings.set("audio", "sfxVolume", value)
+            settings.audio.sfxVolume = value
+        end
+    }, {
+        id = 7,
+        type = "checkbox",
+        label = "Mute SFX",
+        x = 350,
+        y = 590,
+        width = 30,
+        height = 30,
+        getValue = function()
+            return settings.audio.sfxMuted
+        end,
+        setValue = function(value)
+            Settings.set("audio", "sfxMuted", value)
+            settings.audio.sfxMuted = value
         end
     }}
 end
@@ -255,11 +280,15 @@ end
 -- Update settings screen
 function SettingsScreen.update(dt)
     local mouseX, mouseY = love.mouse.getPosition()
+    local previousHovered = hoveredControl
     hoveredControl = nil
 
     -- Check back button hover
     if isMouseOverControl(backButton) then
         hoveredControl = backButton
+        if previousHovered ~= hoveredControl then
+            SFX.playButtonHover()
+        end
         return
     end
 
@@ -267,6 +296,9 @@ function SettingsScreen.update(dt)
     for _, control in ipairs(controls) do
         if isMouseOverControl(control) then
             hoveredControl = control
+            if previousHovered ~= hoveredControl then
+                SFX.playButtonHover()
+            end
             break
         end
     end
@@ -329,15 +361,18 @@ end
 -- Handle keyboard input
 function SettingsScreen.keypressed(key)
     if key == "escape" then
+        SFX.playButtonClick()
         Settings.save()
         Settings.apply()
         changeState(gameStates.MENU)
     elseif key == "w" or key == "up" then
+        SFX.playButtonHover()
         selectedControl = selectedControl - 1
         if selectedControl < 1 then
             selectedControl = backButton.id
         end
     elseif key == "s" or key == "down" then
+        SFX.playButtonHover()
         selectedControl = selectedControl + 1
         if selectedControl > #controls and selectedControl < backButton.id then
             selectedControl = backButton.id
@@ -345,6 +380,7 @@ function SettingsScreen.keypressed(key)
             selectedControl = 1
         end
     elseif key == "return" or key == "space" then
+        SFX.playButtonClick()
         -- Check if back button is selected
         if selectedControl == backButton.id then
             Settings.save()
@@ -359,6 +395,7 @@ function SettingsScreen.keypressed(key)
             control.setValue(not control.getValue())
         end
     elseif key == "a" then
+        SFX.playButtonClick()
         local control = controls[selectedControl]
         if control then
             if control.type == "slider" then
@@ -370,6 +407,7 @@ function SettingsScreen.keypressed(key)
             end
         end
     elseif key == "d" then
+        SFX.playButtonClick()
         local control = controls[selectedControl]
         if control then
             if control.type == "slider" then
@@ -388,6 +426,7 @@ function SettingsScreen.mousepressed(x, y, button)
     if button == 1 then
         -- Check back button
         if isMouseOverControl(backButton) then
+            SFX.playButtonClick()
             Settings.save()
             Settings.apply()
             changeState(gameStates.MENU)
@@ -397,6 +436,7 @@ function SettingsScreen.mousepressed(x, y, button)
         -- Check controls
         for _, control in ipairs(controls) do
             if isMouseOverControl(control) then
+                SFX.playButtonClick()
                 if control.type == "checkbox" then
                     control.setValue(not control.getValue())
                 elseif control.type == "slider" then

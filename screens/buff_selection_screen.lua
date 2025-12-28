@@ -4,6 +4,7 @@ local BuffSelectionScreen = {}
 
 local Player = require("src/player")
 local Buff = require("src/buff")
+local SFX = require("src/sfx")
 
 -- Buff selection state
 local player
@@ -14,6 +15,7 @@ local selectedBuffs
 local selectionsRemaining
 local maxSelections
 local hoveredButton
+local previousHoveredButton
 local selectedIndex
 local buffButtonNormalImage
 local buffButtonHoverImage
@@ -24,6 +26,7 @@ function BuffSelectionScreen.load(playerData, states, stateChanger)
     gameStates = states
     changeState = stateChanger
     hoveredButton = nil
+    previousHoveredButton = nil
     selectedIndex = 1
 
     -- Load buff button images
@@ -63,6 +66,14 @@ function BuffSelectionScreen.update(dt)
             hoveredButton = i
             break
         end
+    end
+
+    -- Play hover sound when hoveredButton changes
+    if hoveredButton ~= previousHoveredButton then
+        if hoveredButton ~= nil then
+            SFX.playButtonHover()
+        end
+        previousHoveredButton = hoveredButton
     end
 end
 
@@ -161,13 +172,16 @@ function BuffSelectionScreen.keypressed(key)
         if selectedIndex < 1 then
             selectedIndex = #buffChoices
         end
+        SFX.playButtonHover()
     elseif key == "s" or key == "down" then
         -- Move selection down
         selectedIndex = selectedIndex + 1
         if selectedIndex > #buffChoices then
             selectedIndex = 1
         end
+        SFX.playButtonHover()
     elseif key == "return" or key == "space" then
+        SFX.playButtonClick()
         -- Select the currently highlighted buff
         local selectedBuff = buffChoices[selectedIndex]
 
@@ -194,6 +208,7 @@ function BuffSelectionScreen.keypressed(key)
             selectedIndex = 1
         end
     elseif key == "escape" and #selectedBuffs == 0 then
+        SFX.playButtonClick()
         -- Allow ESC to go back to menu (only if no selections made yet)
         changeState(gameStates.MENU)
     end
@@ -202,6 +217,7 @@ end
 -- Handle mouse input
 function BuffSelectionScreen.mousepressed(x, y, button)
     if button == 1 and hoveredButton then
+        SFX.playButtonClick()
         local selectedBuff = buffChoices[hoveredButton]
 
         -- Add buff to selected buffs list

@@ -4,6 +4,7 @@ local UpgradeScreen = {}
 
 local Upgrades = require("src/upgrades")
 local Save = require("src/save")
+local SFX = require("src/sfx")
 
 -- Screen state
 local player
@@ -18,6 +19,7 @@ local categoryColors
 local cardNormalImage
 local cardHoverImage
 local detailPanelImage
+local previousHoveredIndex
 
 -- Initialize upgrade screen
 function UpgradeScreen.load(playerData, states, stateChanger)
@@ -63,6 +65,7 @@ end
 -- Handle navigation
 local function navigateUp()
     if selectedIndex > 1 then
+        SFX.playButtonHover()
         selectedIndex = selectedIndex - 1
         selectedUpgradeId = upgradeList[selectedIndex]
 
@@ -75,6 +78,7 @@ end
 
 local function navigateDown()
     if selectedIndex < #upgradeList then
+        SFX.playButtonHover()
         selectedIndex = selectedIndex + 1
         selectedUpgradeId = upgradeList[selectedIndex]
 
@@ -87,6 +91,7 @@ end
 
 -- Attempt to purchase selected upgrade
 local function purchaseUpgrade()
+    SFX.playButtonClick()
     local success, message = Upgrades.purchase(player, selectedUpgradeId)
 
     if success then
@@ -100,12 +105,42 @@ end
 
 -- Return to previous screen
 local function exitUpgradeScreen()
+    SFX.playButtonClick()
     changeState(gameStates.MAP_SELECTION)
 end
 
 -- Update upgrade screen
 function UpgradeScreen.update(dt)
-    -- Nothing to update currently
+    -- Check for hover changes on upgrade cards
+    local mouseX, mouseY = love.mouse.getPosition()
+    local hoveredIndex = nil
+
+    local listPanelX = 50
+    local listPanelY = 130
+    local listPanelWidth = 400
+    local itemHeight = 90
+    local itemPadding = 10
+
+    local startIndex = scrollOffset + 1
+    local endIndex = math.min(scrollOffset + maxVisibleUpgrades, #upgradeList)
+
+    for i = startIndex, endIndex do
+        local itemY = listPanelY + ((i - scrollOffset - 1) * itemHeight) + itemPadding
+        local itemX = listPanelX + itemPadding
+        local itemWidth = listPanelWidth - (itemPadding * 2)
+        local itemButtonHeight = 80
+
+        if mouseX >= itemX and mouseX <= itemX + itemWidth and mouseY >= itemY and mouseY <= itemY + itemButtonHeight then
+            hoveredIndex = i
+            break
+        end
+    end
+
+    -- Play hover sound when hovering over a new item
+    if hoveredIndex ~= previousHoveredIndex and hoveredIndex ~= nil then
+        SFX.playButtonHover()
+    end
+    previousHoveredIndex = hoveredIndex
 end
 
 -- Draw upgrade screen
@@ -332,6 +367,7 @@ function UpgradeScreen.mousepressed(x, y, button)
             local itemWidth = listPanelWidth - (itemPadding * 2)
 
             if x >= itemX and x <= itemX + itemWidth and y >= itemY and y <= itemY + itemHeight - itemPadding then
+                SFX.playButtonClick()
                 selectedIndex = i
                 selectedUpgradeId = upgradeList[selectedIndex]
                 return
