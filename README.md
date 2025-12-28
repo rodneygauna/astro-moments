@@ -4,7 +4,7 @@
 
 A cozy space mining microgame where every minute counts! Collect as many asteroids as possible within the time limit, earn currency, and upgrade your spaceship to become the ultimate miner.
 
-![Game Status](https://img.shields.io/badge/status-in%20development-yellow)
+![Game Status](https://img.shields.io/badge/status-released-brightgreen)
 ![Love2D](https://img.shields.io/badge/LÖVE-11.5-EA316E)
 ![Lua](https://img.shields.io/badge/Lua-5.1-blue)
 
