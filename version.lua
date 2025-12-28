@@ -32,10 +32,21 @@
 -- }
 local Version = {}
 
-Version.current = "1.0.0"
-Version.buildDate = "December 27, 2025"
+Version.current = "1.0.1"
+Version.buildDate = "December 28, 2025"
 
 Version.changelog = {{
+    version = "1.0.1",
+    date = "December 28, 2025",
+    type = "patch",
+    highlights = {"Enhanced time warning visibility"},
+    changes = {
+        added = {"Red flashing effect for time remaining when 10 seconds or less in mining screen"},
+        fixed = {},
+        changed = {},
+        upcoming = {}
+    }
+}, {
     version = "1.0.0",
     date = "December 27, 2025",
     type = "major",
