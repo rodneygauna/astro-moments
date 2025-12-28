@@ -32,62 +32,27 @@
 -- }
 local Version = {}
 
-Version.current = "0.3.0"
-Version.buildDate = "January 15, 2025"
+Version.current = "1.0.0"
+Version.buildDate = "December 27, 2025"
 
 Version.changelog = {{
-    version = "0.3.0",
-    date = "January 15, 2025",
-    type = "minor",
-    highlights = {"New visual effects for obstacles", "Performance optimizations"},
-    changes = {
-        added = {"Particle effects for solar flares", "Animated accretion disk for black holes",
-                 "Visual trails for meteors"},
-        fixed = {"Memory leak in cosmic dust particle system", "Frame rate drops in Sector 10"},
-        changed = {"Improved rendering performance by 30%",
-                   "Reduced particle count for better frame rates on older systems"},
-        upcoming = {"New buff system for power-ups", "Custom ship skins and colors", "Daily challenge missions"}
-    }
-}, {
-    version = "0.2.0",
-    date = "January 5, 2025",
-    type = "minor",
-    highlights = {"Quality of life improvements", "Bug fixes and balance changes"},
-    changes = {
-        added = {"Pause menu in mining screen", "Ability to refuel from map screen",
-                 "Scrollbars for better navigation in upgrade and map screens"},
-        fixed = {"Crash when exiting to menu during mining", "Fuel not being refunded when stopping mining early",
-                 "Asteroid spawn rate not applying upgrade bonuses correctly"},
-        changed = {"Increased base fuel tank capacity from 100 to 120", "Reduced fuel cost for early sectors",
-                   "Collection radius upgrade now provides 15% per level (was 10%)"}
-    }
-}, {
-    version = "0.1.0",
-    date = "December 19, 2024",
+    version = "1.0.0",
+    date = "December 27, 2025",
     type = "major",
-    highlights = {"Initial release", "10 sectors with progressive difficulty",
-                  "5 obstacle types including Black Hole boss"},
+    highlights = {"Initial release for Codedex Winter 2025 Game Jam", "Complete gameplay loop with 10 sectors",
+                  "Full progression and upgrade systems"},
     changes = {
-        added = {"Complete obstacle system (Solar Flares, Cosmic Dust, Space Debris, Meteors, Black Hole)",
-                 "Collision-triggered warning system for environmental hazards",
-                 "Refactored obstacle codebase into modular structure",
-                 "Staggered meteor spawns for better gameplay flow",
-                 "Inverse square law gravity for realistic Black Hole physics",
-                 "Random obstacle generation for Sector 10 (Chaos Zone)",
-                 "Velocity friction system for smooth bounce mechanics",
-                 "Boundary protection to prevent players being pushed outside playable area"},
-        fixed = {"Black hole spawning on top of player ship at session start",
-                 "Asteroids not being deleted when consumed by black hole",
-                 "Meteor bounce pushing player outside boundary",
-                 "Ship deceleration fighting against black hole gravity",
-                 "Collision detection using ship corner instead of center"},
-        changed = {"Meteor bounce force adjusted to 800 (from 1000) for better feel",
-                   "Black hole spawn location moved to 80% of play area radius",
-                   "Increased meteor spawn distance to 300px outside play area",
-                   "Sector 10 changed from 'Tranquility Zone' to 'Chaos Zone'"}
+        added = {"Mining gameplay with physics-based spaceship controls",
+                 "10 unique sectors with progressive difficulty",
+                 "Environmental obstacles: solar flares, cosmic dust, space debris, meteors, and black hole boss",
+                 "Buff selection system with rarity tiers", "Permanent upgrade system for spaceship capabilities",
+                 "Complete UI with sound effects and music", "Save/load system with persistent progress",
+                 "Settings menu with audio and video controls"},
+        fixed = {},
+        changed = {},
+        upcoming = {"New buff varieties", "More spaceship customization options"}
     }
-} -- Future versions will be added here
-}
+}}
 
 -- Get the most recent changelog entries
 function Version.getLatestChanges(count)
