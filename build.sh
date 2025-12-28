@@ -7,7 +7,8 @@ set -e  # Exit on error
 
 # Configuration
 GAME_NAME="AstroMoments"
-GAME_VERSION="1.0.0"
+# Extract version from version.lua
+GAME_VERSION=$(grep 'Version.current' version.lua | sed 's/.*"\(.*\)".*/\1/')
 LOVE_VERSION="11.5"  # Update this to match your LÖVE version
 BUILD_DIR="builds"
 DIST_DIR="dist"
