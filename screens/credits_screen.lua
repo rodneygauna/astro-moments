@@ -141,13 +141,13 @@ function CreditsScreen.draw()
     -- Draw credits content
     love.graphics.setColor(1, 1, 1)
     love.graphics.setFont(GameFonts.title)
-    love.graphics.printf("Astro Moments", 0, 100, love.graphics.getWidth(), "center")
+    love.graphics.printf("Astro Moments", 0, 30, love.graphics.getWidth(), "center")
 
     love.graphics.setFont(GameFonts.medium)
-    love.graphics.printf("Credits", 0, 160, love.graphics.getWidth(), "center")
+    love.graphics.printf("Credits", 0, 75, love.graphics.getWidth(), "center")
 
     love.graphics.setFont(GameFonts.normal)
-    local creditsY = 220
+    local creditsY = 120
     local lineSpacing = 30
 
     -- Credits
@@ -164,12 +164,31 @@ function CreditsScreen.draw()
     creditsY = creditsY + lineSpacing
     love.graphics.printf("dkjson Library", 0, creditsY, love.graphics.getWidth(), "center")
 
+    creditsY = creditsY + lineSpacing * 2
+    love.graphics.printf("Font", 0, creditsY, love.graphics.getWidth(), "center")
+    creditsY = creditsY + lineSpacing
+    love.graphics.printf("Press Start by Cody 'Codeman38' Boisclair", 0, creditsY, love.graphics.getWidth(), "center")
+
+    creditsY = creditsY + lineSpacing * 2
+    love.graphics.printf("Music", 0, creditsY, love.graphics.getWidth(), "center")
+    creditsY = creditsY + lineSpacing
+    love.graphics.printf("AI-Generated Tracks via Suno", 0, creditsY, love.graphics.getWidth(), "center")
+
+    creditsY = creditsY + lineSpacing * 2
+    love.graphics.printf("Special Thanks", 0, creditsY, love.graphics.getWidth(), "center")
+    creditsY = creditsY + lineSpacing
+    love.graphics.printf("To my wife Jaclyn for her support", 0, creditsY, love.graphics.getWidth(), "center")
+    creditsY = creditsY + lineSpacing
+    love.graphics.printf("To my son Max for giving me joy and confidence", 0, creditsY, love.graphics.getWidth(),
+        "center")
+
+    creditsY = creditsY + lineSpacing * 2
+    love.graphics.printf("Built for the Codedex Winter 2025 Game Jam", 0, creditsY, love.graphics.getWidth(), "center")
+
     -- Controls hint at bottom
     love.graphics.setColor(0.7, 0.7, 0.7)
     love.graphics.setFont(GameFonts.normal)
-    love.graphics.printf("Built for the Codedex Winter 2025 Game Jam", 0, love.graphics.getHeight() - 80,
-        love.graphics.getWidth(), "center")
-    love.graphics.printf("[ESC] Return to Menu", 0, love.graphics.getHeight() - 50, love.graphics.getWidth(), "center")
+    love.graphics.printf("[ESC] Return to Menu", 0, love.graphics.getHeight() - 40, love.graphics.getWidth(), "center")
 end
 
 -- Handle keyboard input
