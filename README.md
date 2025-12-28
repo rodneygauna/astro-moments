@@ -113,11 +113,13 @@ Files stored:
 - **[Lua](https://www.lua.org/)** - Programming language
 - **[LÖVE 2D](https://love2d.org/)** - Game framework
 - **[Aseprite](https://www.aseprite.org/)** - Pixel art creation
+- **[Suno](https://suno.com/)** - AI-generated music tracks
 
 ### Libraries
 
 - **[HUMP](https://github.com/vrld/hump)** - Camera system and helper utilities
 - **[dkjson](https://github.com/LuaDist/dkjson)** - JSON encoding and decoding
+- **[Press Start Font by Cody 'Codeman38' Boisclair](https://www.dafont.com/profile.php?user=155190)** - Font used for UI and text
 
 ## Sector Progression
 
