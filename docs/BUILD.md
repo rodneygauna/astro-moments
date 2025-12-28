@@ -9,54 +9,54 @@ This guide explains how to create distribution packages for Windows, macOS, and 
 
 2. **Directory Structure**: Create a `love-binaries` directory with the following structure:
 
-```text
-love-binaries/
-├── windows/
-│   ├── love.exe
-│   ├── SDL2.dll
-│   ├── OpenAL32.dll
-│   ├── lua51.dll
-│   ├── mpg123.dll
-│   ├── msvcp120.dll
-│   ├── msvcr120.dll
-│   └── license.txt
-├── macos/
-│   └── love.app/
-└── linux/
-    ├── bin/
-    ├── lib/
-    └── share/
-```
+   ```text
+   love-binaries/
+   ├── windows/
+   │   ├── love.exe
+   │   ├── SDL2.dll
+   │   ├── OpenAL32.dll
+   │   ├── lua51.dll
+   │   ├── mpg123.dll
+   │   ├── msvcp120.dll
+   │   ├── msvcr120.dll
+   │   └── license.txt
+   ├── macos/
+   │   └── love.app/
+   └── linux/
+       ├── bin/
+       ├── lib/
+       └── share/
+   ```
 
 3. **Linux Requirements** (optional, for AppImage):
    - Install `appimagetool`:
 
-```bash
-wget https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
-chmod +x appimagetool-x86_64.AppImage
-sudo mv appimagetool-x86_64.AppImage /usr/local/bin/appimagetool
-```
+     ```bash
+     wget https://github.com/AppImage/AppImageKit/releases/download/continuous/appimagetool-x86_64.AppImage
+     chmod +x appimagetool-x86_64.AppImage
+     sudo mv appimagetool-x86_64.AppImage /usr/local/bin/appimagetool
+     ```
 
 ## Quick Start
 
 1. **Download LÖVE Binaries**:
 
-```bash
-mkdir -p love-binaries/{windows,macos,linux}
-# Extract downloaded LÖVE binaries into respective folders
-```
+   ```bash
+   mkdir -p love-binaries/{windows,macos,linux}
+   # Extract downloaded LÖVE binaries into respective folders
+   ```
 
 2. **Make the build script executable**:
 
-```bash
-chmod +x build.sh
-```
+   ```bash
+   chmod +x build.sh
+   ```
 
 3. **Run the build script**:
 
-```bash
-./build.sh
-```
+   ```bash
+   ./build.sh
+   ```
 
 4. **Find your builds** in the `dist/` directory:
    - `AstroMoments-1.0.0-Windows.zip`
