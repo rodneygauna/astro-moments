@@ -52,11 +52,59 @@ Navigate your tiny spaceship through the depths of space, collecting asteroids w
 
 ## Getting Started
 
-### Prerequisites
+### For Players (Pre-built Releases)
+
+Download the latest release for your platform from the [Releases page](https://github.com/rodneygauna/astro-moments/releases).
+
+#### Windows
+
+1. Download `AstroMoments-[version]-Windows.zip`
+2. Extract the ZIP file to any folder
+3. Double-click `AstroMoments.exe` to play
+   - No installation required - it's a standalone executable
+   - All dependencies included
+
+#### macOS
+
+1. Download `AstroMoments-[version]-macOS.zip`
+2. Extract the ZIP file
+3. Drag `AstroMoments.app` to your Applications folder (optional)
+4. Double-click `AstroMoments.app` to play
+   - First launch may show a security warning: Right-click → Open → Confirm
+
+#### Linux
+
+1. **Install LÖVE** from your package manager:
+
+   ```bash
+   # Debian/Ubuntu
+   sudo apt install love
+
+   # Arch
+   sudo pacman -S love
+
+   # Fedora
+   sudo dnf install love
+   ```
+
+2. **Download and run**:
+
+   ```bash
+   # Download AstroMoments-[version]-Linux.tar.gz
+   tar -xzf AstroMoments-*.tar.gz
+   cd linux
+   love AstroMoments.love
+   ```
+
+   Or double-click `AstroMoments.love` if file associations are set up.
+
+### For Developers (Running from Source)
+
+#### Prerequisites
 
 - [LÖVE 2D](https://love2d.org/) (version 11.5 or higher)
 
-### Installation & Running
+#### Installation & Running
 
 1. **Clone the repository**
 
