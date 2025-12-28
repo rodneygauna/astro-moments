@@ -5,19 +5,19 @@ local Asteroid = {}
 -- Asteroid type definitions (Interesting read: https://en.wikipedia.org/wiki/Asteroid_mining)
 Asteroid.types = {{
     id = "silicates", -- Olivine, pyroxene; most common
-    value = 1,
+    value = 2,
     color = {0.5, 0.4, 0.3} -- Gray-brown
 }, {
     id = "carbonaceous", -- Organic-rich material
-    value = 2,
+    value = 3,
     color = {0.2, 0.15, 0.1} -- Dark brown/black
 }, {
     id = "iron", -- Metallic iron
-    value = 3,
+    value = 4,
     color = {0.4, 0.4, 0.45} -- Dark metallic gray
 }, {
     id = "nickel", -- Iron-nickel alloy component
-    value = 5,
+    value = 6,
     color = {0.45, 0.45, 0.4} -- Nickel gray
 }, {
     id = "magnesium_silicates", -- Olivine variants
@@ -25,63 +25,63 @@ Asteroid.types = {{
     color = {0.5, 0.5, 0.35} -- Olive-green gray
 }, {
     id = "aluminum_minerals", -- Plagioclase group
-    value = 13,
+    value = 12,
     color = {0.7, 0.7, 0.7} -- Light gray
 }, {
     id = "calcium_minerals", -- Anorthite, etc.
-    value = 31,
+    value = 16,
     color = {0.8, 0.8, 0.75} -- Off-white
 }, {
     id = "sulfides", -- Troilite (FeS)
-    value = 44,
+    value = 24,
     color = {0.6, 0.5, 0.2} -- Brassy yellow-brown
 }, {
     id = "water_ice", -- Often found in outer-belt asteroids
-    value = 75,
+    value = 32,
     color = {0.7, 0.9, 1.0} -- Light blue
 }, {
     id = "carbonates", -- Calcite, dolomite
-    value = 1109,
+    value = 48,
     color = {0.9, 0.9, 0.85} -- Cream white
 }, {
     id = "clay_minerals", -- Phyllosilicates
-    value = 11,
+    value = 64,
     color = {0.55, 0.45, 0.35} -- Clay brown
 }, {
     id = "graphite", -- Pure carbon crystals
-    value = 12,
+    value = 96,
     color = {0.15, 0.15, 0.15} -- Very dark gray
 }, {
     id = "chromium_oxides", -- Chromite and related minerals
-    value = 13,
+    value = 128,
     color = {0.3, 0.3, 0.25} -- Dark gray-green
 }, {
     id = "cobalt", -- Trace metal in iron meteorites
-    value = 14,
+    value = 192,
     color = {0.5, 0.5, 0.6} -- Blue-gray metallic
 }, {
     id = "titanium_oxides", -- Rutile, ilmenite
-    value = 15,
+    value = 256,
     color = {0.3, 0.25, 0.3} -- Dark purple-gray
 }, {
     id = "rare_earths", -- REE-bearing minerals
-    value = 16,
+    value = 384,
     color = {0.6, 0.4, 0.7} -- Purple-tinted
 }, {
     id = "platinum_group", -- Pt, Ir, Os, Pd
-    value = 17,
+    value = 512,
     color = {0.8, 0.8, 0.85} -- Silver-white
 }, {
     id = "gold", -- Present in trace amounts
-    value = 18,
+    value = 768,
     color = {1.0, 0.84, 0} -- Golden
 }, {
     id = "microdiamonds", -- Nanodiamonds from impacts
-    value = 19,
+    value = 1024,
     color = {0.9, 0.95, 1.0} -- Bright white-cyan
 }, {
     id = "amino_acids", -- Extremely rare organic precursors
-    value = 20,
+    value = 1536,
     color = {0.4, 0.6, 0.5} -- Organic green-gray
 }}
 

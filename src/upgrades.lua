@@ -102,13 +102,13 @@ Upgrades.catalog = {
         name = "Cargo Expansion",
         description = "More cargo space per run",
         category = "cargo",
-        maxLevel = 5,
+        maxLevel = 10,
         baseCost = 100,
         costMultiplier = 1.5,
         effect = {
             stat = "cargoCapacityBonus",
             type = "flat",
-            valuePerLevel = 2 -- +2 cargo per level
+            valuePerLevel = 30 -- +30 cargo per level (max 300 at level 10)
         }
     },
 

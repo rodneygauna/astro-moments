@@ -9,45 +9,45 @@ Buff.definitions = {{
     name = "Faster Collection",
     description = "Increases collection speed by a percentage.",
     type = "multiplier",
-    minValue = 10,
-    maxValue = 50,
+    minValue = 5,
+    maxValue = 15,
     rarity = "common"
 }, {
     id = "decay_speed_reduction",
     name = "Decay Speed Reduction",
     description = "Reduces decay speed by a percentage.",
     type = "multiplier",
-    minValue = 10,
-    maxValue = 50,
+    minValue = 5,
+    maxValue = 15,
     rarity = "common"
 }, {
     id = "increased_collection_radius",
     name = "Increased Collection Radius",
     description = "Increases the collection field radius by a percentage.",
     type = "multiplier",
-    minValue = 20,
-    maxValue = 80,
+    minValue = 5,
+    maxValue = 15,
     rarity = "uncommon"
 }, {
     id = "max_speed_boost",
     name = "Max Speed Boost",
     description = "Increases the spaceship's maximum speed by a flat amount.",
     type = "flat",
-    minValue = 20,
-    maxValue = 50,
+    minValue = 10,
+    maxValue = 25,
     rarity = "uncommon"
 }, {
     id = "acceleration_boost",
     name = "Acceleration Boost",
     description = "Increases the spaceship's acceleration by a flat amount.",
     type = "flat",
-    minValue = 50,
-    maxValue = 100,
+    minValue = 10,
+    maxValue = 25,
     rarity = "uncommon"
 }, {
     id = "value_boost",
     name = "Value Boost",
-    description = "Increases the value of collected asteroids by a multiplier (e.g., 1.5x).",
+    description = "Increases the value of collected asteroids by a multiplier.",
     type = "multiplier",
     minValue = 20,
     maxValue = 100,
@@ -57,8 +57,8 @@ Buff.definitions = {{
     name = "Extended Time",
     description = "Adds extra seconds to the mining round timer.",
     type = "flat",
-    minValue = 10,
-    maxValue = 30,
+    minValue = 5,
+    maxValue = 15,
     rarity = "rare"
 }}
 
