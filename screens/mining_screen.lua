@@ -603,8 +603,15 @@ function MiningScreen.draw()
     love.graphics.printf("Cargo: " .. spaceship.currentCargo .. " / " .. spaceship.maxCargo, 0, 10,
         love.graphics.getWidth(), "center")
 
-    -- Draw time left (top right)
+    -- Draw time left (top right) - flash red when 10 seconds or less
+    if timeLeft <= 10 then
+        local flashAlpha = 0.5 + 0.5 * math.abs(math.sin(love.timer.getTime() * 5))
+        love.graphics.setColor(1, 0.2, 0.2, flashAlpha)
+    else
+        love.graphics.setColor(1, 1, 1)
+    end
     love.graphics.printf("Time Left: " .. math.ceil(timeLeft) .. "s", love.graphics.getWidth() - 200, 10, 200, "right")
+    love.graphics.setColor(1, 1, 1) -- Reset color
 
     -- Draw gold (top left)
     love.graphics.print("Gold: " .. player.currency.gold, 10, 10)
