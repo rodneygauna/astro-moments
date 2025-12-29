@@ -75,16 +75,63 @@ download_love_binaries() {
         echo -e "${GREEN}✓ macOS binaries downloaded${NC}"
     fi
 
-    # Download Linux (we'll use AppImage approach)
-    if [ ! -d "linux" ] || [ -z "$(ls -A linux 2>/dev/null)" ]; then
-        echo -e "${BLUE}Downloading Linux binaries...${NC}"
-        mkdir -p linux
-        # For Linux, we'll just note that users can run the .love file directly
-        # or we can provide instructions to install LÖVE from their package manager
-        echo -e "${YELLOW}Note: Linux users can run the .love file directly with LÖVE installed${NC}"
-        echo -e "${YELLOW}Or install via: sudo apt install love (Debian/Ubuntu)${NC}"
-        touch linux/.placeholder
-        echo -e "${GREEN}✓ Linux distribution ready (.love file)${NC}"
+    # Setup Linux binaries (extract from system LÖVE if available)
+    if [ ! -d "linux/bin" ] || [ ! -f "linux/bin/love" ]; then
+        echo -e "${BLUE}Setting up Linux binaries...${NC}"
+
+        # Check if LÖVE is installed on the system
+        if command -v love &> /dev/null; then
+            echo -e "${BLUE}Found LÖVE installed on system, extracting binaries...${NC}"
+            mkdir -p linux/{bin,lib,share}
+
+            # Find the LÖVE executable
+            LOVE_PATH=$(which love)
+
+            # If it's a symbolic link, follow it
+            if [ -L "$LOVE_PATH" ]; then
+                LOVE_PATH=$(readlink -f "$LOVE_PATH")
+            fi
+
+            # Copy the love binary
+            cp "$LOVE_PATH" linux/bin/love
+            chmod +x linux/bin/love
+
+            # Try to find and copy required shared libraries
+            # This uses ldd to find dependencies
+            echo -e "${BLUE}Copying required libraries...${NC}"
+            mkdir -p linux/lib
+
+            # Get library dependencies and copy them
+            ldd "$LOVE_PATH" 2>/dev/null | grep "=> /" | awk '{print $3}' | while read lib; do
+                if [ -f "$lib" ]; then
+                    # Only copy libraries that aren't standard system libraries
+                    case "$lib" in
+                        /lib/x86_64-linux-gnu/*|/usr/lib/x86_64-linux-gnu/*)
+                            # Skip standard system libraries, they should be on target systems
+                            ;;
+                        *)
+                            cp "$lib" linux/lib/ 2>/dev/null || true
+                            ;;
+                    esac
+                fi
+            done
+
+            # Create a minimal share directory structure
+            mkdir -p linux/share/applications
+
+            echo -e "${GREEN}✓ Linux binaries extracted from system LÖVE${NC}"
+        else
+            echo -e "${YELLOW}LÖVE not found on system${NC}"
+            echo -e "${YELLOW}Options:${NC}"
+            echo -e "${YELLOW}  1. Install LÖVE: sudo apt install love (Debian/Ubuntu)${NC}"
+            echo -e "${YELLOW}  2. Download and extract LÖVE AppImage to love-binaries/linux/${NC}"
+            echo -e "${YELLOW}  3. Just distribute the .love file for Linux users${NC}"
+            mkdir -p linux
+            touch linux/.placeholder
+            echo -e "${GREEN}✓ Linux distribution ready (.love file only)${NC}"
+        fi
+    else
+        echo -e "${GREEN}✓ Linux binaries found${NC}"
     fi
 
     cd ..
@@ -207,7 +254,13 @@ echo -e "\n${BLUE}Building for Linux (AppImage)...${NC}"
 LINUX_DIR="$DIST_DIR/linux"
 mkdir -p "$LINUX_DIR"
 
-if command -v appimagetool &> /dev/null && [ -d "love-binaries/linux" ]; then
+# Check if we have actual LÖVE binaries (not just placeholder)
+HAS_LINUX_BINARIES=false
+if [ -d "love-binaries/linux" ] && [ -d "love-binaries/linux/bin" ]; then
+    HAS_LINUX_BINARIES=true
+fi
+
+if command -v appimagetool &> /dev/null && [ "$HAS_LINUX_BINARIES" = true ]; then
     APPDIR="$BUILD_DIR/${GAME_NAME}.AppDir"
     mkdir -p "$APPDIR/usr/bin"
     mkdir -p "$APPDIR/usr/lib"
@@ -220,8 +273,14 @@ if command -v appimagetool &> /dev/null && [ -d "love-binaries/linux" ]; then
     # Copy the .love file
     cp "$LOVE_FILE" "$APPDIR/usr/share/${GAME_NAME}.love"
 
-    # Create desktop entry
-    cat > "$APPDIR/usr/share/applications/${GAME_NAME}.desktop" << EOF
+    # Copy icon if available (use spaceship sprite as icon)
+    if [ -f "sprites/ships/Spaceship.png" ]; then
+        cp "sprites/ships/Spaceship.png" "$APPDIR/${GAME_NAME}.png"
+        cp "sprites/ships/Spaceship.png" "$APPDIR/usr/share/icons/hicolor/256x256/apps/${GAME_NAME}.png"
+    fi
+
+    # Create desktop entry (needs to be in root of AppDir for appimagetool)
+    cat > "$APPDIR/${GAME_NAME}.desktop" << EOF
 [Desktop Entry]
 Name=$GAME_NAME
 Exec=love ${GAME_NAME}.love
@@ -229,6 +288,9 @@ Icon=${GAME_NAME}
 Type=Application
 Categories=Game;
 EOF
+
+    # Also copy to standard location
+    cp "$APPDIR/${GAME_NAME}.desktop" "$APPDIR/usr/share/applications/${GAME_NAME}.desktop"
 
     # Create AppRun script
     cat > "$APPDIR/AppRun" << 'EOF'
@@ -241,14 +303,24 @@ exec "${HERE}/usr/bin/love" "${HERE}/usr/share/AstroMoments.love" "$@"
 EOF
     chmod +x "$APPDIR/AppRun"
 
-    # Create AppImage
-    appimagetool "$APPDIR" "$LINUX_DIR/${GAME_NAME}-${GAME_VERSION}-x86_64.AppImage"
+    # Create AppImage (set architecture explicitly)
+    ARCH=x86_64 appimagetool "$APPDIR" "$LINUX_DIR/${GAME_NAME}-${GAME_VERSION}-x86_64.AppImage"
 
     echo -e "${GREEN}✓ Linux AppImage build complete${NC}"
 else
-    echo -e "${RED}⚠ appimagetool not found or Linux LÖVE binaries missing${NC}"
-    echo -e "${RED}  Install appimagetool: https://appimage.github.io/appimagetool/${NC}"
-    echo -e "${RED}  Or just distribute the .love file for Linux users${NC}"
+    if [ "$HAS_LINUX_BINARIES" = false ]; then
+        echo -e "${YELLOW}⚠ Linux LÖVE binaries not found in love-binaries/linux${NC}"
+        echo -e "${YELLOW}  To create an AppImage, you need to:${NC}"
+        echo -e "${YELLOW}  1. Download LÖVE Linux binaries or compile from source${NC}"
+        echo -e "${YELLOW}  2. Extract them to love-binaries/linux/ (should include bin/, lib/, share/ directories)${NC}"
+        echo -e "${YELLOW}  3. Install appimagetool if not already installed${NC}"
+    elif ! command -v appimagetool &> /dev/null; then
+        echo -e "${YELLOW}⚠ appimagetool not found${NC}"
+        echo -e "${YELLOW}  Install appimagetool: https://appimage.github.io/appimagetool/${NC}"
+    fi
+
+    echo -e "${YELLOW}  Falling back to .love file distribution for Linux${NC}"
+    echo -e "${YELLOW}  Linux users can run: love ${GAME_NAME}.love${NC}"
 
     # As fallback, just copy the .love file
     cp "$LOVE_FILE" "$LINUX_DIR/"

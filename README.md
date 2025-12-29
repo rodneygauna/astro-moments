@@ -76,6 +76,22 @@ Download the latest release for your platform from the [Releases page](https://g
 
 #### Linux
 
+##### Option 1: AppImage (Recommended - No Installation Required)
+
+1. Download `AstroMoments-[version]-x86_64.AppImage`
+2. Make it executable and run:
+
+   ```bash
+   chmod +x AstroMoments-*.AppImage
+   ./AstroMoments-*.AppImage
+   ```
+
+   Or double-click the AppImage file in your file manager.
+   - No dependencies required - everything is bundled!
+   - Works on most Linux distributions
+
+##### Option 2: With LÖVE Installed
+
 1. **Install LÖVE** from your package manager:
 
    ```bash

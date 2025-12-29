@@ -45,17 +45,28 @@ fi
 WINDOWS_ZIP="${DIST_DIR}/AstroMoments-${GAME_VERSION}-Windows.zip"
 MACOS_ZIP="${DIST_DIR}/AstroMoments-${GAME_VERSION}-macOS.zip"
 LINUX_TAR="${DIST_DIR}/AstroMoments-${GAME_VERSION}-Linux.tar.gz"
+LINUX_APPIMAGE="${DIST_DIR}/linux/AstroMoments-${GAME_VERSION}-x86_64.AppImage"
 LOVE_FILE="${DIST_DIR}/AstroMoments.love"
 
-if [ ! -f "$WINDOWS_ZIP" ] || [ ! -f "$MACOS_ZIP" ] || [ ! -f "$LINUX_TAR" ] || [ ! -f "$LOVE_FILE" ]; then
-    echo -e "${RED}Error: Distribution files not found${NC}"
-    echo -e "${YELLOW}Expected files:${NC}"
-    echo -e "  - $WINDOWS_ZIP"
-    echo -e "  - $MACOS_ZIP"
-    echo -e "  - $LINUX_TAR"
-    echo -e "  - $LOVE_FILE"
+# Check for required files
+MISSING_FILES=""
+[ ! -f "$WINDOWS_ZIP" ] && MISSING_FILES="${MISSING_FILES}  - $WINDOWS_ZIP\n"
+[ ! -f "$MACOS_ZIP" ] && MISSING_FILES="${MISSING_FILES}  - $MACOS_ZIP\n"
+[ ! -f "$LINUX_TAR" ] && MISSING_FILES="${MISSING_FILES}  - $LINUX_TAR\n"
+[ ! -f "$LOVE_FILE" ] && MISSING_FILES="${MISSING_FILES}  - $LOVE_FILE\n"
+
+if [ -n "$MISSING_FILES" ]; then
+    echo -e "${RED}Error: Required distribution files not found${NC}"
+    echo -e "${YELLOW}Missing files:${NC}"
+    echo -e "$MISSING_FILES"
     echo -e "${YELLOW}Run ./build.sh first${NC}"
     exit 1
+fi
+
+# Check for optional AppImage
+HAS_APPIMAGE=false
+if [ -f "$LINUX_APPIMAGE" ]; then
+    HAS_APPIMAGE=true
 fi
 
 # Check if tag already exists
@@ -96,6 +107,9 @@ echo -e "\nFiles to be released:"
 echo -e "  - Windows: $(basename "$WINDOWS_ZIP")"
 echo -e "  - macOS: $(basename "$MACOS_ZIP")"
 echo -e "  - Linux: $(basename "$LINUX_TAR")"
+if [ "$HAS_APPIMAGE" = true ]; then
+    echo -e "  - Linux AppImage: $(basename "$LINUX_APPIMAGE")"
+fi
 echo -e "  - Universal: $(basename "$LOVE_FILE")"
 echo -e "${BLUE}================================================${NC}"
 
@@ -254,7 +268,8 @@ RELEASE_NOTES="${RELEASE_NOTES}
 ### Downloads
 - **Windows**: Download and extract the Windows ZIP, then run \`AstroMoments.exe\`
 - **macOS**: Download and extract the macOS ZIP, then run \`AstroMoments.app\`
-- **Linux**: Extract the Linux TAR.GZ and run with LÖVE
+- **Linux AppImage**: Download the AppImage, make it executable (\`chmod +x\`), and run it—no installation needed!
+- **Linux (with LÖVE)**: Extract the Linux TAR.GZ and run with LÖVE
 - **Universal**: If you have LÖVE installed, download and run \`AstroMoments.love\`
 "
 
@@ -315,13 +330,26 @@ fi
 
 # Create GitHub release with files
 echo -e "\n${BLUE}Creating GitHub release...${NC}"
+
+# Write release notes to temporary file to avoid quoting issues
+NOTES_FILE=$(mktemp)
+echo "$RELEASE_NOTES" > "$NOTES_FILE"
+
+# Build file list for release
+RELEASE_FILES=("$WINDOWS_ZIP" "$MACOS_ZIP" "$LINUX_TAR")
+if [ "$HAS_APPIMAGE" = true ]; then
+    RELEASE_FILES+=("$LINUX_APPIMAGE")
+fi
+RELEASE_FILES+=("$LOVE_FILE")
+
+# Create the release
 gh release create "$TAG" \
-    "$WINDOWS_ZIP" \
-    "$MACOS_ZIP" \
-    "$LINUX_TAR" \
-    "$LOVE_FILE" \
+    "${RELEASE_FILES[@]}" \
     --title "Astro Moments $TAG" \
-    --notes "$RELEASE_NOTES"
+    --notes-file "$NOTES_FILE"
+
+# Clean up temporary file
+rm -f "$NOTES_FILE"
 
 echo -e "\n${GREEN}✓ Release created successfully!${NC}"
 echo -e "${BLUE}================================================${NC}"

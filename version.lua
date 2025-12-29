@@ -32,10 +32,22 @@
 -- }
 local Version = {}
 
-Version.current = "1.0.2"
-Version.buildDate = "December 28, 2025"
+Version.current = "1.0.3"
+Version.buildDate = "December 29, 2025"
 
 Version.changelog = {{
+    version = "1.0.3",
+    date = "December 29, 2025",
+    type = "patch",
+    highlights = {"Linux AppImage support for standalone distribution"},
+    changes = {
+        added = {"Automated AppImage creation from system LÖVE installation",
+                 "Self-contained Linux executable requiring no dependencies"},
+        fixed = {},
+        changed = {"Improved Linux distribution with AppImage format"},
+        upcoming = {}
+    }
+}, {
     version = "1.0.2",
     date = "January 2, 2026",
     type = "patch",
