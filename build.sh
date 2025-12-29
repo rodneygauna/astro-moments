@@ -135,6 +135,9 @@ cd "$OLDPWD"
 # Clean up temp directory
 rm -rf "$TEMP_DIR"
 
+# Copy .love file to dist directory for standalone distribution
+cp "$LOVE_FILE" "$DIST_DIR/"
+
 echo -e "${GREEN}✓ Created $LOVE_FILE${NC}"
 
 # Package for each platform
@@ -286,7 +289,10 @@ echo -e "\n${GREEN}[5/5] Build Summary${NC}"
 echo -e "${BLUE}================================================${NC}"
 echo -e "Build complete! Distributions created in: ${GREEN}$DIST_DIR${NC}"
 echo ""
-echo "Archives created:"
+echo "Standalone .love file:"
+ls -lh "$DIST_DIR"/*.love 2>/dev/null | awk '{print "  " $9 " (" $5 ")"}'
+echo ""
+echo "Platform archives:"
 ls -lh "$DIST_DIR"/*.{zip,tar.gz} 2>/dev/null | awk '{print "  " $9 " (" $5 ")"}'
 echo ""
 echo -e "${BLUE}================================================${NC}"

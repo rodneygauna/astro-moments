@@ -32,10 +32,21 @@
 -- }
 local Version = {}
 
-Version.current = "1.0.1"
+Version.current = "1.0.2"
 Version.buildDate = "December 28, 2025"
 
 Version.changelog = {{
+    version = "1.0.2",
+    date = "January 2, 2026",
+    type = "patch",
+    highlights = {"Universal .love file for all platforms"},
+    changes = {
+        added = {"Packaged .love file for easy distribution across Windows, macOS, and Linux"},
+        fixed = {},
+        changed = {},
+        upcoming = {}
+    }
+}, {
     version = "1.0.1",
     date = "December 28, 2025",
     type = "patch",

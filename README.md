@@ -100,6 +100,19 @@ Download the latest release for your platform from the [Releases page](https://g
 
    Or double-click `AstroMoments.love` if file associations are set up.
 
+#### Universal .love File (All Platforms)
+
+If you already have LÖVE installed on any platform, you can download and run the standalone `.love` file:
+
+1. Download `AstroMoments.love` from the releases page
+2. Run it with LÖVE:
+
+   ```bash
+   love AstroMoments.love
+   ```
+
+   Or double-click the file if LÖVE file associations are configured on your system.
+
 ### For Developers (Running from Source)
 
 #### Prerequisites
